@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Prep Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #ddd;
+    }
+    .tab-button {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background: #f3f4f6;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-button.active {
+      font-weight: bold;
+      border-bottom: 2px solid #007bff;
+      background: #e8f0fe;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Exam Prep Assistant</h1>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="youtube">Summarize YouTube</button>
+      <button class="tab-button" data-tab="pdf">Summarize PDF</button>
+      <button class="tab-button" data-tab="quiz">Quiz Maker</button>
+      <button class="tab-button" data-tab="assistant">Past Papers & AI Assistant</button>
+    </div>
+    <div class="tab-content active" id="youtube">
+      <h2>YouTube Transcript Summarizer</h2>
+      <input type="text" id="youtube-link" placeholder="Enter YouTube Link">
+      <button onclick="handleYouTubeSummarize()">Summarize</button>
+    </div>
+    <div class="tab-content" id="pdf">
+      <h2>PDF Summarizer</h2>
+      <textarea id="pdf-text" placeholder="Paste PDF Text Here"></textarea>
+      <button onclick="handlePdfSummarize()">Summarize</button>
+    </div>
+    <div class="tab-content" id="quiz">
+      <h2>Quiz Maker</h2>
+      <textarea id="quiz-text" placeholder="Enter content for quiz generation"></textarea>
+      <button onclick="handleGenerateQuiz()">Generate Quiz</button>
+      <div id="quiz-output"></div>
+    </div>
+    <div class="tab-content" id="assistant">
+      <h2>Past Papers & AI Assistant</h2>
+      <p>Access past question papers and get help from the AI assistant for your study needs.</p>
+      <button>View Past Papers</button>
+      <button>Ask AI Assistant</button>
+    </div>
+  </div>
+  <script>
+  const API_BASE_URL = "http://127.0.0.1:5000";
+
+  // Function to summarize YouTube video
+  function handleYouTubeSummarize() {
+    const youtubeLink = document.getElementById("youtube-link").value;
+    fetch(${API_BASE_URL}/summarize/youtube, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ link: youtubeLink }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert(YouTube Summary: ${data.summary});
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  // Function to summarize PDF text
+  function handlePdfSummarize() {
+    const pdfText = document.getElementById("pdf-text").value;
+    fetch(${API_BASE_URL}/summarize/pdf, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: pdfText }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert(PDF Summary: ${data.summary});
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  // Function to generate quiz
+  function handleGenerateQuiz() {
+    const quizText = document.getElementById("quiz-text").value;
+    fetch(${API_BASE_URL}/generate/quiz, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: quizText }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const output = document.getElementById("quiz-output");
+        output.innerHTML = `
+          <h3>Generated Quiz:</h3>
+          ${data.quiz
+            .map(
+              (q, index) => `
+                <p>${index + 1}. ${q.question}</p>
+                <ul>
+                  ${q.options.map((option) => <li>${option}</li>).join("")}
+                </ul>
+              `
+            )
+            .join("")}
+        `;
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+</script>
+</body>
+</html>
